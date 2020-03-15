@@ -1,0 +1,82 @@
+#include <iostream>
+#include <vector>
+#include <map>
+#include <unordered_map>
+#include <set>
+#include <unordered_set>
+#include <string>
+#include <queue>
+#include <stack>
+#include <sstream>
+#include <cmath>
+using namespace std;
+
+struct TreeNode {
+	int val;
+	TreeNode* left;
+	TreeNode* right;
+	TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};
+
+struct ListNode {
+	int val;
+	ListNode *next;
+	ListNode(int x) : val(x), next(NULL) {}
+};
+
+/* Solution */
+const int MOD = 1000000007;
+class Solution {
+public:
+    vector<string> removeSubfolders(vector<string>& folder) {
+        sort(folder.begin(), folder.end());
+        vector<string> ans;
+        ans.push_back(folder.front());
+
+        for (int i = 1; i < folder.size(); ++i) {
+        	if (ans.back() == folder[i].substr(0, ans.back().size()) &&
+        		folder[i].size() > ans.back().size() &&
+        		folder[i][ans.back().size()] == '/') {
+        		continue;
+        	} else {
+        		ans.push_back(folder[i]);
+        	}
+        }
+
+        return ans;
+    }
+};
+
+int main() {
+	/* Solution */
+	Solution sol;
+
+	/* Test cases */
+	vector<string> folder;
+	folder.push_back("/a/b/c");
+	folder.push_back("/a/b/ca");
+	folder.push_back("/a/b/d");
+	// folder.push_back("/c/d/e");
+	// folder.push_back("/c/f");
+
+	vector<string> ans = sol.removeSubfolders(folder);
+	for (int i = 0; i < ans.size(); ++i) cout << ans[i] << endl;
+
+	/* [1-D vector] */
+	// const int a = 1;
+	// int arr[] = {};
+	// vector<int> nums(arr, arr + a);
+
+	/* [2-D vector] */
+	// const int rows = 1;
+	// const int cols = 1;
+	// int arr[rows][cols] = {{1}};
+	// vector<vector<int> > grid;
+	// for (int r = 0; r < rows; ++r) {
+	// 	grid.push_back(vector<int>(arr[r], arr[r] + cols));
+	// }
+
+	/* [String] */
+	// string str = "";
+
+}
