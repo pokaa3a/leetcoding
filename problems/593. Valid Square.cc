@@ -36,45 +36,40 @@ void traverse(TreeNode* root) {
 const int MOD = 1000000007;
 class Solution {
 public:
-    int minSwap(vector<int>& A, vector<int>& B) {
-    	int n = A.size();
-    	// dp[i][0/1]: min swaps of 0...i and last one is 0:no swapped, 1:swapped
-    	vector<vector<int> > dp(n, vector<int>(2, 9999));
-    	dp[0][0] = 0;
-    	dp[0][1] = 1;
-    	for (int i = 1; i < n; i++) {
-    		// no swap
-    		if (A[i] > A[i - 1] && B[i] > B[i - 1]) {	// [i - 1] no swap
-    			dp[i][0] = min(dp[i][0], dp[i - 1][0]);
-    		}
-    		if (A[i] > B[i - 1] && B[i] > A[i - 1]) {	// [i - 1] has swap
-    			dp[i][0] = min(dp[i][0], dp[i - 1][1]);
-    		}
-
-    		// swap
-    		if (B[i] > A[i - 1] && A[i] > B[i - 1]) {	// [i - 1] no swap
-    			dp[i][1] = min(dp[i][1], dp[i - 1][0] + 1);
-    		}
-    		if (B[i] > B[i - 1] && A[i] > A[i - 1]) {	// [i - 1] has swap
-    			dp[i][1] = min(dp[i][1], dp[i - 1][1] + 1);
-    		}
-    	}
-    	return min(dp[n - 1][0], dp[n - 1][1]);
+    bool validSquare(vector<int>& p1, vector<int>& p2, vector<int>& p3, vector<int>& p4) {
+        if (try_square(p1, p2, p3, p4) ||
+        	try_square(p1, p3, p2, p4) ||
+        	try_square(p1, p4, p2, p3)) return true;
+        return false;
+    }
+    bool try_square(vector<int>& p, vector<int>& q, vector<int>& r, vector<int>& s) {
+    	if (p[0] == q[0] && p[1] == q[1]) return false;
+    	if ((q[0] - p[0])*(q[0] - p[0]) + (q[1] - p[1])*(q[1] - p[1]) == 
+    		(r[0] - s[0])*(r[0] - s[0]) + (r[1] - s[1])*(r[1] - s[1]) &&
+    		q[0] + p[0] == r[0] + s[0] &&
+    		q[1] + p[1] == r[1] + s[1] && 
+    		(p[0] - r[0])*(p[0] - r[0]) + (p[1] - r[1])*(p[1] - r[1]) ==
+    		(p[0] - s[0])*(p[0] - s[0]) + (p[1] - s[1])*(p[1] - s[1])) return true;
+    	return false;
     }
 };
+
+
 
 int main() {
 	/* Solution */
 	Solution sol;
 
 	/* Test cases */
-	int a[] = {1,3,5,4}, b[] = {1,2,3,7};
-	vector<int> A(a, a + sizeof(a) / sizeof(int)), B(b, b + sizeof(b) / sizeof(int));
-	cout << sol.minSwap(A, B) << endl;
 
 	/* [1-D vector] */
 	// int arr[] = {};
 	// vector<int> nums(arr, arr + sizeof(arr) / sizeof(int));
+	int a1[] = {0,0}, a2[] = {5,0}, a3[] = {0,4}, a4[] = {5,4};
+	vector<int> p1(a1, a1 + 2), p2(a2, a2 + 2), p3(a3, a3 + 2), p4(a4, a4 + 2);
+
+	cout << sol.validSquare(p1, p2, p3, p4) << endl;
+
 
 	/* [2-D vector] */
 	// const int rows = 1;

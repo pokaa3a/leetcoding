@@ -36,41 +36,46 @@ void traverse(TreeNode* root) {
 const int MOD = 1000000007;
 class Solution {
 public:
-    int minSwap(vector<int>& A, vector<int>& B) {
-    	int n = A.size();
-    	// dp[i][0/1]: min swaps of 0...i and last one is 0:no swapped, 1:swapped
-    	vector<vector<int> > dp(n, vector<int>(2, 9999));
-    	dp[0][0] = 0;
-    	dp[0][1] = 1;
-    	for (int i = 1; i < n; i++) {
-    		// no swap
-    		if (A[i] > A[i - 1] && B[i] > B[i - 1]) {	// [i - 1] no swap
-    			dp[i][0] = min(dp[i][0], dp[i - 1][0]);
-    		}
-    		if (A[i] > B[i - 1] && B[i] > A[i - 1]) {	// [i - 1] has swap
-    			dp[i][0] = min(dp[i][0], dp[i - 1][1]);
-    		}
+    int longestLine(vector<vector<int> >& M) {
+        int m = M.size(), n = m > 0 ? M[0].size() : 0;
+        if (m == 0 || n == 0) return 0;
 
-    		// swap
-    		if (B[i] > A[i - 1] && A[i] > B[i - 1]) {	// [i - 1] no swap
-    			dp[i][1] = min(dp[i][1], dp[i - 1][0] + 1);
-    		}
-    		if (B[i] > B[i - 1] && A[i] > A[i - 1]) {	// [i - 1] has swap
-    			dp[i][1] = min(dp[i][1], dp[i - 1][1] + 1);
-    		}
-    	}
-    	return min(dp[n - 1][0], dp[n - 1][1]);
+        vector<vector<int> > h(m, vector<int>(n, 0)), v(m, vector<int>(n, 0)), dg(m, vector<int>(n, 0)), adg(m, vector<int>(n, 0));
+
+        int ans = 0;
+        for (int i = 0; i < m; i++) {
+        	for (int j = 0; j < n; j++) {
+        		if (M[i][j] == 0) continue;
+
+        		// h
+        		h[i][j] = (i == 0 ? 0 : h[i - 1][j]) + 1;
+
+        		// v
+        		v[i][j] = (j == 0 ? 0 : v[i][j - 1]) + 1;
+
+        		// dg
+        		dg[i][j] = (i == 0 || j == 0 ? 0 : dg[i - 1][j - 1]) + 1;
+
+        		// adg
+        		adg[i][j] = (i == 0 || j == n - 1 ? 0 : adg[i - 1][j + 1]) + 1;
+
+        		ans = max(ans, h[i][j]);
+        		ans = max(ans, v[i][j]);
+        		ans = max(ans, dg[i][j]);
+        		ans = max(ans, adg[i][j]);
+        	}
+        }
+        return ans;
     }
 };
+
+
 
 int main() {
 	/* Solution */
 	Solution sol;
 
 	/* Test cases */
-	int a[] = {1,3,5,4}, b[] = {1,2,3,7};
-	vector<int> A(a, a + sizeof(a) / sizeof(int)), B(b, b + sizeof(b) / sizeof(int));
-	cout << sol.minSwap(A, B) << endl;
 
 	/* [1-D vector] */
 	// int arr[] = {};
