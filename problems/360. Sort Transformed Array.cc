@@ -28,7 +28,7 @@ public:
 		int p1 = lower_bound(nums.begin(), nums.end(), extreme) - nums.begin() - 1;
 		int p2 = p1 + 1;
 
-		cout << "p1 = " << p1 << " p2 = " << p2 << endl;
+		// cout << "p1 = " << p1 << " p2 = " << p2 << endl;
 
 		if (a > 0) {
 			int i = 0;
