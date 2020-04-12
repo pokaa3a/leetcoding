@@ -1,122 +1,152 @@
 #include <iostream>
-#include <queue>
 #include <vector>
-#include <set>
 #include <map>
+#include <unordered_map>
+#include <set>
+#include <unordered_set>
+#include <string>
+#include <queue>
+#include <stack>
+#include <sstream>
+#include <cmath>
+#include <numeric>
 using namespace std;
 
-class ascending {
-public:
-	bool operator() (vector<int> a, vector<int> b) {
-		return a[0] > b[0];	// small to large
-	}
+struct TreeNode {
+	int val;
+	TreeNode* left;
+	TreeNode* right;
+	TreeNode(int x) : val(x), left(NULL), right(NULL) {}
 };
 
-class descending {
-public:
-	bool operator() (pair<int, int> a, pair<int, int> b) {
-		return a.first < b.first;	// large to small
-	}
+struct ListNode {
+	int val;
+	ListNode *next;
+	ListNode(int x) : val(x), next(NULL) {}
 };
 
+void traverse(TreeNode* root) {
+	if (!root) return;
+	cout << root->val << endl;
+	traverse(root->left);
+	traverse(root->right);
+}
+
+/* Solution */
+const int MOD = 1000000007;
 class Solution {
-public: 
-    vector<pair<int, int> > getSkyline(vector<vector<int> >& buildings) {
-    	vector<pair<int, int> > skyline;
-        for (int i = 0; i < buildings.size(); ++i) {
-        	int new_li = buildings[i][0];
-        	int new_ri = buildings[i][1];
-        	int new_hi = buildings[i][2];
-        	while (!Ri_q.empty()) {
-        		int ri = Ri_q.top()[0];
-        		int hi = Ri_q.top()[1];
-        		int building_id = Ri_q.top()[2];
-        		if (ri >= new_li) break;
-        		if (building_id == Hi_q.top().second) {	// is the current highest
-        			Hi_q.pop();
-        			if (hi != getCurrentHi()) pushSkyline(ri, getCurrentHi(), false);
-        		} else {
-        			finished.insert(building_id);
-        		}
-        		Ri_q.pop();
-        	}
-        	if (new_hi > getCurrentHi()) {
-        		pushSkyline(new_li, new_hi, true);
-        	}
-        	int tmp[] = {new_ri, new_hi, i};
-        	Ri_q.push(vector<int>(tmp, tmp+3));
-        	Hi_q.push(make_pair(new_hi, i));
-        }
-        while (!Ri_q.empty()) {
-        	int ri = Ri_q.top()[0];
-        	int hi = Ri_q.top()[1];
-        	int building_id = Ri_q.top()[2];
-        	if (building_id == Hi_q.top().second) {	// is the current highest
-        		Hi_q.pop();
-        		if (hi != getCurrentHi()) pushSkyline(ri, getCurrentHi(), false);
-        	} else {
-        		finished.insert(building_id);
-        	}
-        	Ri_q.pop();
-        }
-        return getSkyline();
+public:
+    vector<vector<int>> getSkyline(vector<vector<int>>& buildings) {
+        return getSkyline(buildings, 0, buildings.size() - 1);
+    }
+    vector<vector<int>> getSkyline(vector<vector<int>>& buildings, int lo, int hi) {
+    	int n = hi - lo + 1;
+    	vector<vector<int>> output;
+    	if (n == 0) return output;
+    	if (n == 1) {
+    		output.push_back(vector<int>{buildings[lo][0], buildings[lo][2]});
+    		output.push_back(vector<int>{buildings[lo][1], 0});
+            return output;
+    	}
+    	int mid = lo + (hi - lo) / 2;
+    	vector<vector<int>> leftSkyLine = getSkyline(buildings, lo, mid);
+    	vector<vector<int>> rightSkyLine = getSkyline(buildings, mid + 1, hi);
+    	return mergeSkyLines(leftSkyLine, rightSkyLine);
     }
 
-    int getCurrentHi() {
-    	while (!Hi_q.empty()) {
-    		int building_id = Hi_q.top().second;
-    		if (finished.count(building_id) == 0) {
-    			return Hi_q.top().first;
+    vector<vector<int>> mergeSkyLines(vector<vector<int>>& leftSkyLine, 
+    								  vector<vector<int>>& rightSkyLine) {
+    	int nL = leftSkyLine.size(), nR = rightSkyLine.size();
+    	int pL = 0, pR = 0;
+    	int curY = 0, leftY = 0, rightY = 0;
+    	int x, maxY;
+    	vector<vector<int>> output;
+
+    	while (pL < nL && pR < nR) {
+    		vector<int> pointL = leftSkyLine[pL];
+    		vector<int> pointR = rightSkyLine[pR];
+
+    		if (pointL[0] < pointR[0]) {
+    			x = pointL[0];
+    			leftY = pointL[1];
+    			pL++;
+    		} else if (pointR[0] < pointL[0]) {
+    			x = pointR[0];
+    			rightY = pointR[1];
+    			pR++;
     		} else {
-    			Hi_q.pop();
+                if (pointL[1] > pointR[1]) {
+                    x = pointL[0];
+                    leftY = pointL[1];
+                    pL++;
+                } else {
+                    x = pointR[0];
+                    rightY = pointR[1];
+                    pR++;
+                }
+            }
+    		maxY = max(leftY, rightY);
+    		if (curY != maxY) {
+    			updateOutput(output, x, maxY);
+    			curY = maxY;
     		}
     	}
-    	return 0;
+    	appendSkyline(output, leftSkyLine, pL, nL, curY);
+    	appendSkyline(output, rightSkyLine, pR, nR, curY);
+    	return output;
     }
 
-    void pushSkyline(int x, int y, bool left) {
-    	if (buf.count(x)) {
-    		buf[x] = left ? max(buf[x], y) : min(buf[x], y);
+    void updateOutput(vector<vector<int>>& output, int x, int y) {
+    	if (output.size() == 0 || output.back()[0] != x) {
+    		output.push_back(vector<int>{x, y});
     	} else {
-    		buf[x] = y;
+    		output.back()[1] = y;
     	}
     }
 
-    vector<pair<int, int> > getSkyline() {
-    	vector<pair<int, int> > skyline;
-    	for (map<int, int>::iterator it = buf.begin(); it != buf.end(); ++it) {
-    		skyline.push_back(make_pair(it->first, it->second));
+    void appendSkyline(vector<vector<int>>& output, vector<vector<int>>& skyLine,
+    				   int p, int n, int curY) {
+    	while (p < n) {
+    		vector<int> point = skyLine[p];
+    		int x = point[0], y = point[1];
+    		p++;
+    		if (y != curY) {
+    			updateOutput(output, x, y);
+    			curY = y;
+    		}
     	}
-    	return skyline;
     }
-
-private:
-    priority_queue<vector<int>, vector<vector<int> >, ascending> Ri_q;			// each element: [ri, hi, id]
-    priority_queue<pair<int, int>, vector<pair<int, int> >, descending> Hi_q;	// each element: (hi, id)
-    set<int> finished;
-    map<int, int> buf;
 };
 
 
 
 int main() {
-	int b1[] = {2, 4, 7};
-	int b2[] = {2, 4, 5};
-	int b3[] = {2, 4, 6};
-	// int b4[] = {15, 20, 10};
-	// int b5[] = {19, 24, 8};
+	/* Solution */
+	Solution sol;
 
-	vector<vector<int> > buildings;
-	buildings.push_back(vector<int>(b1, b1+3));
-	buildings.push_back(vector<int>(b2, b2+3));
-	buildings.push_back(vector<int>(b3, b3+3));
-	// buildings.push_back(vector<int>(b4, b4+3));
-	// buildings.push_back(vector<int>(b5, b5+3));
+	/* Test cases */
+	vector<vector<int>> buildings = {{1, 2, 1}, {1, 2, 3}};
+	vector<vector<int>> skyline = sol.getSkyline(buildings);
 
-    Solution sol;
-    vector<pair<int, int> > skyline = sol.getSkyline(buildings);
+	for (auto point : skyline) {
+		cout << point[0] << ", " << point[1] << endl;
+	}
 
-    for (int i = 0; i < skyline.size(); ++i) {
-    	cout << skyline[i].first << " " << skyline[i].second << endl;
-    }
+
+	/* [1-D vector] */
+	// int arr[] = {};
+	// vector<int> nums(arr, arr + sizeof(arr) / sizeof(int));
+
+	/* [2-D vector] */
+	// const int rows = 1;
+	// const int cols = 1;
+	// int arr[rows][cols] = {{1}};
+	// vector<vector<int> > grid;
+	// for (int r = 0; r < rows; ++r) {
+	// 	grid.push_back(vector<int>(arr[r], arr[r] + cols));
+	// }
+
+	/* [String] */
+	// string str = "";
+
 }

@@ -34,27 +34,48 @@ void traverse(TreeNode* root) {
 
 /* Solution */
 const int MOD = 1000000007;
-class Solution {
+class CombinationIterator {
 public:
-    int lengthOfLongestSubstringKDistinct(string s, int k) {
-        if (k == 0) return 0;
-        unordered_map<char, int> count;
-        
-        int lo = 0, hi = 0;
-        count[s[lo]]++;
-        int ans = 0;
-        while (lo < s.size()) {
-        	cout << "lo: " << lo << endl;
-            while (hi + 1 < s.size() && (count.size() < k || (count.find(s[hi + 1]) != count.end()))) {
-                hi++;
-                count[s[hi]]++;
-            }
-            cout << "hi: " << hi << endl;
-            ans = max(ans, hi - lo + 1);
-            if (--count[s[lo]] == 0) count.erase(s[lo]);
-            lo++;
+    vector<int> digits;
+    vector<char> chars;
+    int pivot;
+    CombinationIterator(string characters, int combinationLength) {
+        for (char c : characters) {
+          chars.push_back(c);
         }
+        digits.resize(combinationLength, 0);
+        
+        // initialize
+        for (int i = 0; i < digits.size(); i++) {
+          digits[i] = i;
+        }
+        digits.back()--;
+        pivot = digits.size() - 1;
+    }
+    
+    string next() {
+        if (hasNext()) {
+            int pivot = digits.size() - 1;
+            while (digits[pivot] + 1 == chars.size() - (digits.size() - 1 - pivot)) {
+                pivot--;
+            }
+            digits[pivot]++;
+            for (int i = pivot + 1; i < digits.size(); i++) {
+                digits[i] = digits[i - 1] + 1;
+            }
+        }
+        
+        string ans = "";
+        for (int d : digits) {
+          ans += chars[d];
+        }
+
         return ans;
+    }
+    
+    bool hasNext() {
+        if (digits[0] == chars.size() - digits.size()) return false;
+        else return true;
     }
 };
 
@@ -65,9 +86,6 @@ int main() {
 	Solution sol;
 
 	/* Test cases */
-	string s = "aac";
-	int k = 2;
-	cout << sol.lengthOfLongestSubstringKDistinct(s, k) << endl;
 
 	/* [1-D vector] */
 	// int arr[] = {};
