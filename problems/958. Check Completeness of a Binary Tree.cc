@@ -81,6 +81,40 @@ public:
     }
 };
 
+// BFS
+class Solution {
+public:
+    bool isCompleteTree(TreeNode* root) {
+        if (!root) return true;
+        
+        // BFS
+        queue<TreeNode*> q;
+        q.push(root);
+        
+        bool findEnd = false;
+        
+        while (!q.empty()) {
+            int q_size = q.size();
+            for (int i = 0; i < q_size; i++) {
+                TreeNode* cur = q.front();
+                q.pop();
+                
+                if (findEnd && (cur->left || cur->right)) return false;
+                if (!cur->left && cur->right) return false;
+                if (!cur->right) findEnd = true;
+                
+                if (cur->left) {
+                    q.push(cur->left);
+                }
+                if (cur->right) {
+                    q.push(cur->right);
+                }
+            }
+        }
+        return true;
+    }
+};
+
 int main() {
 	/* Solution */
 	Solution sol;

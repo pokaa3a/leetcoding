@@ -52,6 +52,14 @@ public:
         dfs(0, adj, visited, disc, low, parent, bridges, time);
         return bridges;
     }
+    // u: The vertex to be visited next
+    // visited: Keeps tract of visited vertices
+    // disc: Discovery times of visited vertices
+    // low[v]: Earliest visited vertex reachable from subtree rooted with v
+    // parent: Parent vertices in DFS tree
+
+    // condition for an edge (u,v) to be a bridge is low[v] > disc[u]
+
     void dfs(int u, vector<vector<int> >& adj, vector<bool>& visited, vector<int>& disc, vector<int>& low,
     		 vector<int>& parent, vector<vector<int> >& bridges, int& time) {
     	visited[u] = true;
@@ -66,10 +74,8 @@ public:
 
     			low[u] = min(low[u], low[v]);
     			if (low[v] > disc[u]) {
-    				int b[] = {u, v};
-    				bridges.push_back(vector<int>(b, b + 2));
+    				bridges.push_back({u, v});
     			}
-
     		} else if (v != parent[u]) {
     			low[u] = min(low[u], low[v]);
     		}
