@@ -37,7 +37,26 @@ const int MOD = 1000000007;
 class Solution {
 public:
     void nextPermutation(vector<int>& nums) {
-        
+        int maxi = nums.back();
+        for (int i = nums.size() - 1; i >= 0; i--) {
+            if (nums[i] >= maxi) {
+                maxi = nums[i];
+            } else {
+                int lo = i + 1, hi = nums.size() - 1;
+                while (lo < hi) {
+                    int mid = lo + (hi - lo + 1) / 2;
+                    if (nums[mid] > nums[i]) {
+                        lo = mid;
+                    } else {
+                        hi = mid - 1;
+                    }
+                }
+                swap(nums[lo], nums[i]);
+                sort(nums.begin() + i + 1, nums.end());
+                return;
+            }
+        }
+        sort(nums.begin(), nums.end());
     }
 };
 
