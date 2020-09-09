@@ -4,25 +4,25 @@ using namespace std;
 
 class Solution {
 public:
-	int firstMissingPositive(vector<int>& nums) {
-		int n = nums.size();
-		bool hasOne = false;
-		for (int i = 0; i < n; i++) {
-			if (nums[i] == 1) hasOne = true;
-			else if (nums[i] < 1 || nums[i] > n) nums[i] = 1;
-		}
-		if (!hasOne) return 1;
-		if (n == 1) return 2;
-		for (auto x : nums) {
-			nums[abs(x) - 1] = -abs(nums[abs(x) - 1]);
-		}
-		int first_pos = 1;
-		while (first_pos <= n) {
-			if (nums[first_pos - 1] > 0) return first_pos;
-			first_pos++;
-		}
-		return first_pos;
-	}
+  int firstMissingPositive(vector<int>& nums) {
+    bool hasOne = false;
+    int n = nums.size();
+    for (int i = 0; i < nums.size(); i++) {
+      if (nums[i] == 1) hasOne = true;
+      else if (nums[i] < 1 || nums[i] > n) {
+        nums[i] = 1;
+      }
+    }
+    if (!hasOne) return 1;
+    
+    for (int i = 0; i < n; i++) {
+      nums[abs(nums[i]) - 1] = -abs(nums[abs(nums[i]) - 1]);
+    }
+    for (int i = 0; i < n; i++) {
+      if (nums[i] > 0) return i + 1;
+    }
+    return n + 1;
+  }
 };
 
 int main() {
