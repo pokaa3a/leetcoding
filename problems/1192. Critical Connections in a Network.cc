@@ -34,6 +34,7 @@ void traverse(TreeNode* root) {
 
 /* Solution */
 const int MOD = 1000000007;
+// Ref: https://www.geeksforgeeks.org/bridge-in-a-graph/?fbclid=IwAR3gh1CtdCjBlbI9-yxk8NkXmIABgzXdJSjTLxYGeFcrz23oXopXkQW3wTI
 class Solution {
 public:
     vector<vector<int> > criticalConnections(int n, vector<vector<int> >& connections) {
@@ -54,11 +55,13 @@ public:
     }
     // u: The vertex to be visited next
     // visited: Keeps tract of visited vertices
-    // disc: Discovery times of visited vertices
-    // low[v]: Earliest visited vertex reachable from subtree rooted with v
+    // disc[v]: Discovery times of vertice v in DFS
+    // low[v]: Earliest discovery time among all visited vertex in the subtree rooted with v
     // parent: Parent vertices in DFS tree
 
-    // condition for an edge (u,v) to be a bridge is low[v] > disc[u]
+    // Condition for an edge u->v (the direction here is the visiting order in DFS) to be 
+    // a bridge is low[v] > disc[u], which means the earliest dicovery time that v has
+    // is later than the discovery time of u, so there is only one way from u to v.
 
     void dfs(int u, vector<vector<int> >& adj, vector<bool>& visited, vector<int>& disc, vector<int>& low,
     		 vector<int>& parent, vector<vector<int> >& bridges, int& time) {
