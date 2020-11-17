@@ -1,17 +1,20 @@
 class Solution {
 public:
     int numDecodings(string s) {
-        int n=s.length();
-        if(n==0 || s[0]=='0') return 0;
+        int n = s.size();
+        if (n == 0 || s[0] == '0') return 0;
         
-        int pre=1, next=1,res=1;
-        for(int i=1; i<n; i++){
-            if(s[i]=='0') next=0;
-            if(!(s[i-1]=='1'||s[i-1]=='2'&&s[i]<='6')) pre=0;
-            res = pre+next;
-            pre = next;
-            next = res;
+        vector<int> dp(n + 1, 0);
+        dp[0] = 1;
+        for (int i = 0; i < n; i++) {
+            if (s[i] >= '1') dp[i + 1] += dp[i];
+            if (i >= 1) {
+                int two = stoi(s.substr(i - 1, 2));
+                if (two >= 10 && two <= 26) {
+                    dp[i + 1] += dp[i - 1];
+                }
+            }
         }
-        return res;
+        return dp[n];
     }
 };
