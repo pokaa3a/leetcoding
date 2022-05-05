@@ -1,50 +1,41 @@
 #include <iostream>
 #include <vector>
-#include <pair>
+#include <unordered_map>
 using namespace std;
 
-class Solution {
+class Solution
+{
 public:
-    vector<int> findOrder(int numCourses, vector<pair<int, int>>& prerequisites) {
-        vector<vector<int>> graph = makeGraph(numCourses, prerequisites);
-        vector<int> inorders = computeInOrders(graph);
-
-        queue<int> zero_inorder;
-        vector<int> order;
-        
-        for (int i = 0; i < numCourses; ++i) {
-            if (inorders[i] == 0)
-                zero_inorder.push(i);
+    vector<int> findOrder(int numCourses, vector<vector<int> > &prerequisites)
+    {
+        unordered_map<int, vector<int> > graph;
+        for (auto pre : prerequisites)
+        {
+            graph[pre[0]].push_back(pre[1]);
         }
-        int count = 0;
-        while (!zero_inorder.empty()) {
-            int n = zero_inorder.front();
-            zero_inorder.pop();
-            order.push_back(n);
-            count++;
-            for (auto m : graph[n]) {
-                if (--inorders[m] == 0) {
-                    zero_inorder.push(m);
-                }
-            }
+        vector<int> status(numCourses, 0); // 0: not visited, 1: visited, 2: added
+        vector<int> res;
+        for (int i = 0; i < numCourses; i++)
+        {
+            if (!tp_sort(i, graph, status, res))
+                return vector<int>();
         }
-        return (count != numCourses ? vector<int>() : order);
+        return res;
     }
-private:
-    vector<vector<int>> makeGraph(int numCourses, vector<pair<int, int>>& prerequisites) {
-        vector<vector<int>> graph(numCourses);
-        for (auto edge : prerequisites) {
-            graph[edge.second].push_back(edge.first);
+    bool tp_sort(int course, unordered_map<int, vector<int> > &graph, vector<int> &status, vector<int> &res)
+    {
+        if (status[course] == 2)
+            return true;
+        if (status[course] == 1)
+            return false;
+        status[course] = 1;
+        for (auto next : graph[course])
+        {
+            if (!tp_sort(next, graph, status, res))
+                return false;
         }
-        return graph;
-    }
-    vector<int> computeInOrders(vector<vector<int>> graph) {
-        vector<int> inorders(graph.size(), 0);
-        for (auto nodes : graph) {
-            for (auto node : nodes) {
-                inorders[node]++;
-            }
-        }
-        return inorders;
+        status[course] = 2;
+        res.push_back(course);
+        return true;
     }
 };
