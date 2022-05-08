@@ -1,6 +1,6 @@
 # Visual Studio cache directory
 .vs/
 .vscode/
-*.a
 *.dSYM
 *.DS_Store
+out/
